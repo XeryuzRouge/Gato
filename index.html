@@ -10,7 +10,26 @@
 
 <body>
 
-<table>
+<div id="overlay" onClick="startGame()">
+	<div id="text">Overlay Text</div>
+</div>
+
+<div id="UI">
+<div id="VS">Player vs CPU
+</div>
+<div >Score X =
+<div id="scoreX">0</div>
+</div>
+<div >Score O =
+<div id="scoreO">0</div>
+</div>
+<div >Empates=
+<div id="empates">0</div>
+</div>
+<button type="button" id="El_Switch" onClick="SwitchPlayers()">Player vs Player</button>
+</div>
+
+<table id="La_Tabla">
 <tr>
 <td class="cell" id="0"></td>
 <td class="cell" id="1"></td>
@@ -30,8 +49,6 @@
 <div class="endgame">
 <div class="text"></div>
 </div>
-<button onClick="startGame()">Replay</button>
-
 <script src="script.js"></script>
 </body>
 </html>
