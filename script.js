@@ -1,5 +1,5 @@
 var TurnoActual = "X", SiguienteTurno = "O", VS_COM = 1, MasterCount=0, GanadorT=0, Victorias_X=0, Victorias_O=0, Empates=0;
-var tablero, winCombos;
+var winCombos;
 
 const cells = document.querySelectorAll('.cell');
 
@@ -18,7 +18,7 @@ function startGame() {
 	[0, 4, 8],
 	[2, 4, 6]
 ]
-tablero = ["0", "1", "2", "3", "4", "5", "6", "7", "8"];
+
 	document.getElementById('La_Tabla').style.filter="blur(0px)";
 	document.getElementById("overlay").style.display = "none";
 	document.querySelector(".endgame").style.display = "none";
@@ -37,8 +37,8 @@ function turnClick(square) {
 	if(cells[aidi].innerText != 'X' && cells[aidi].innerText != 'O'){
 	if(TurnoActual=="X"){
 	cells[aidi].innerText = 'X';
-	var targete= tablero.indexOf(aidi);
-tablero[targete]="X";
+	var targete= cells[aidi.innerText];
+
 TurnoActual="O";
 SiguienteTurno="X";
 	checale(aidi);
@@ -48,8 +48,8 @@ if(VS_COM==1 && MasterCount<9){
 }
 else if(TurnoActual=="O"){
 	cells[aidi].innerText = 'O';
-	var targete= tablero.indexOf(aidi);
-tablero[targete]="O";
+	var targete= cells[aidi].id;
+
 TurnoActual="X";
 SiguienteTurno="O";
 checale(aidi);
@@ -74,7 +74,6 @@ function checale(aidi){
 	}
 		if(MasterCount==9)
 		Empate();
-	console.log(cells[0].innerText);
 }
 
 function Ganador(){
@@ -100,54 +99,20 @@ function Empate(){
 }
 
 function Logica_CPU(){
-	var X_EnMismaLinea=0, O_EnMismaLinea=0;
-	var SelecciondeJugada_Lista=false;
-	var CasillaSeleccionada=9, CasillaParaGanar=9, CasillaParaNoPerder=9, CasillaParaSegundoCirculo=9, CasillaParaSeguirJugando=9;
+	var CasillaSeleccionada=9;
 
 	if(GanadorT==0){
 	 if(MasterCount<=1){
-	 	while(CasillaSeleccionada==9||CasillaSeleccionada=="X")
-		CasillaSeleccionada=tablero[Math.floor(Math.random()*tablero.length)];
+	 	while(CasillaSeleccionada==9||CasillaSeleccionada=="X"){
+		CasillaSeleccionada=cells[Math.floor(Math.random()*cells.length)].id;
+	}
 
 		SelecciondeJugada_Lista=true;
 	}
 
-	for (var i=0; i < winCombos.length; i++){
-		if(SelecciondeJugada_Lista==true)
-			break;
-		else{
-		X_EnMismaLinea=0;
-		O_EnMismaLinea=0;
-		for(var j=0; j< winCombos[i].length; j++ ){
-			if(winCombos[i][j]=="X")
-			X_EnMismaLinea++;
-		else if(winCombos[i][j]=="O")
-			O_EnMismaLinea++;
-		else
-		CasillaSeleccionada=winCombos[i][j];
+else
+	CasillaSeleccionada=RevisarTablero();
 
-	}
-
-	       if(X_EnMismaLinea==0&&O_EnMismaLinea==2)
-	      SelecciondeJugada_Lista=true;
-         if(X_EnMismaLinea==2&&O_EnMismaLinea==0)
-            CasillaParaNoPerder=CasillaSeleccionada;
-		if(X_EnMismaLinea==0&&O_EnMismaLinea==1)
-			CasillaParaSegundoCirculo=CasillaSeleccionada;
-		if(X_EnMismaLinea<=1&&O_EnMismaLinea==1)
-			CasillaParaSeguirJugando=CasillaSeleccionada;
-	}
-	}
-	if(SelecciondeJugada_Lista==false){
-		if(CasillaParaNoPerder<9)
-			CasillaSeleccionada=CasillaParaNoPerder;
-	     else if(CasillaParaSegundoCirculo<9)
-			CasillaSeleccionada=CasillaParaSegundoCirculo;
-		else
-			CasillaSeleccionada=CasillaParaSeguirJugando;
-	}
-
-	tablero[CasillaSeleccionada]="O";
 	cells[CasillaSeleccionada].innerText = 'O';
 	TurnoActual="X";
 SiguienteTurno="O";
@@ -173,4 +138,57 @@ document.getElementById("scoreX").innerText=Victorias_X;
 document.getElementById("scoreO").innerText=Victorias_O;
 document.getElementById("empates").innerText=Empates;
 	startGame();
+}
+
+function RevisarTablero(){
+		var X_EnMismaLinea=0, O_EnMismaLinea=0;
+		var SelecciondeJugada_Lista=false;
+		var	CasillaParaEntregar=9, Nivel_Prioridad=4, PosibleCasilla, NuevoNivel;
+
+for (var i=0; i < winCombos.length; i++){
+		if(SelecciondeJugada_Lista==true)
+			break;
+		else{
+		X_EnMismaLinea=0;
+		O_EnMismaLinea=0;
+
+		for(var j=0; j< winCombos[i].length; j++ ){
+			if(winCombos[i][j]=="X")
+			X_EnMismaLinea++;
+
+		else if(winCombos[i][j]=="O")
+			O_EnMismaLinea++;
+
+		else
+		PosibleCasilla=winCombos[i][j];
+	}
+		   NuevoNivel=ResolucionDeCombinaciones (X_EnMismaLinea, O_EnMismaLinea);
+	       if(Nivel_Prioridad>NuevoNivel){
+	         Nivel_Prioridad=NuevoNivel
+	         CasillaParaEntregar=PosibleCasilla;
+	       }
+	   }
+
+	}
+
+	return CasillaParaEntregar;
+}
+
+function ResolucionDeCombinaciones (XInterna, OInterna){
+	var PrioridadInterna;
+
+	     if(XInterna==0&&OInterna==2)
+	     	PrioridadInterna=1;
+
+    else if(XInterna==2&&OInterna==0)
+			PrioridadInterna=2;
+
+	else if(XInterna==0&&OInterna==1)
+			PrioridadInterna=3;
+
+	else  
+			PrioridadInterna=4;
+
+		return PrioridadInterna;
+
 }
