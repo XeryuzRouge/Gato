@@ -4,7 +4,7 @@
     border-radius: 8px;
 }
 
-#scoreX, #scoreO, #empates{
+#scoreX, #scoreO, #TiesID{
 	float: right;
 }
 
@@ -25,7 +25,7 @@
     -ms-transform: translate(-50%,-50%);
 }
 
-#overlay {
+#Overlay {
     position: fixed; /* Sit on top of the page content */
     display: none; /* Hidden by default */
     width: 100%; /* Full width (cover the whole page) */

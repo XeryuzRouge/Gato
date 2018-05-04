@@ -1,11 +1,11 @@
-var TurnoActual = 'X'; 
-var SiguienteTurno = 'O'; 
+var CurrentTurn = 'X'; 
+var NextTurn = 'O'; 
 var VsCOM = true;
-var ContadorDeTurnos = 0;
-var GanadorT = 0;
-var VictoriasX = 0;
-var VictoriasO = 0;
-var Empates = 0;
+var TurnsCounter = 0;
+var Winner = "Still no one";
+var XVictories = 0;
+var OVictories = 0;
+var TiesCounter = 0;
 var winCombos = [];
 
 const cells = document.querySelectorAll('.cell');
@@ -13,71 +13,71 @@ const cells = document.querySelectorAll('.cell');
 startGame();
 
 function startGame() {
-	IniciadorDeVariables();
-	PrepararTablero();
+	VariableInitiator();
+	PrepareBoard();
 
-	if (TurnoActual === 'O' && (VsCOM)){
-		LogicaCPU();
+	if (CurrentTurn === 'O' && (VsCOM)){
+		CPUsLogic();
 	}
 };
 
 function turnClick(square) {
-	var aidi = square.target.id;
-	if (cells[aidi].innerText !== 'X' && cells[aidi].innerText !== 'O'){
-		if (TurnoActual === 'X'){
-			DibujaX(aidi);
-			VerSiHayGanador(aidi);
-			if (VsCOM === true && ContadorDeTurnos<9){
-				LogicaCPU();
+	var SelectedCell = square.target.id;
+	if (cells[SelectedCell].innerText !== 'X' && cells[SelectedCell].innerText !== 'O'){
+		if (CurrentTurn === 'X'){
+			SetX(SelectedCell);
+			CheckForWinner(SelectedCell);
+			if (VsCOM === true && TurnsCounter<9){
+				CPUsLogic();
 			}
-		} else if (TurnoActual === 'O'){
-			DibujaO(aidi);
-			VerSiHayGanador(aidi);
+		} else if (CurrentTurn === 'O'){
+				SetO(SelectedCell);
+				CheckForWinner(SelectedCell);
 		}
 	}
 };
 
-function DibujaX(aidiEnX){
-    cells[aidiEnX].innerText = 'X';
-	var targete = cells[aidiEnX.innerText];
+function SetX(xCell){
+  cells[xCell].innerText = 'X';
+	var targete = cells[xCell.innerText];
 
-	TurnoActual = 'O';
-	SiguienteTurno = 'X';
+	CurrentTurn = 'O';
+	NextTurn = 'X';
 };
 
-function DibujaO(aidiEnO){
-	cells[aidiEnO].innerText = 'O';
-	var targete = cells[aidiEnO].id;
+function SetO(oCell){
+	cells[oCell].innerText = 'O';
+	var targete = cells[oCell].id;
 
-	TurnoActual = 'X';
-	SiguienteTurno = 'O';
+	CurrentTurn = 'X';
+	NextTurn = 'O';
 };
 
-function VerSiHayGanador(aidi){
-	ContadorDeTurnos++;
+function CheckForWinner(SelectedCell){
+	TurnsCounter++;
 
 	for (var i = 0; i < winCombos.length; i++){
-		if (winCombos[i][0] === aidi){
-			winCombos[i][0] = SiguienteTurno;
-		} else if (winCombos[i][1] === aidi){
-			winCombos[i][1] = SiguienteTurno;
-		} else if (winCombos[i][2] === aidi){
-			winCombos[i][2] = SiguienteTurno;
+		if (winCombos[i][0] === SelectedCell){
+			winCombos[i][0] = NextTurn;
+		} else if (winCombos[i][1] === SelectedCell){
+			winCombos[i][1] = NextTurn;
+		} else if (winCombos[i][2] === SelectedCell){
+			winCombos[i][2] = NextTurn;
 		}
-	    if (winCombos[i][0] === SiguienteTurno && winCombos[i][1] === SiguienteTurno && winCombos[i][2] === SiguienteTurno){
-			GanadorT = SiguienteTurno;
-			Ganador();
+	    if (winCombos[i][0] === NextTurn && winCombos[i][1] === NextTurn && winCombos[i][2] === NextTurn){
+			Winner = NextTurn;
+			SomebodyWon();
 		}
 	}
 
-	if (ContadorDeTurnos === 9){
-		Empate();
+	if (TurnsCounter === 9){
+		ItsATie();
 	}
 };
 
-function IniciadorDeVariables(){
-	ContadorDeTurnos = 0;
-	GanadorT = 0;
+function VariableInitiator(){
+	TurnsCounter = 0;
+	Winner = "Still no one";
 	winCombos = [
 	['0', '1', '2'],
 	['3', '4', '5'],
@@ -90,9 +90,9 @@ function IniciadorDeVariables(){
 ]
 };
 
-function PrepararTablero(){
-	document.getElementById('La_Tabla').style.filter = 'blur(0px)';
-	document.getElementById('overlay').style.display = 'none';
+function PrepareBoard(){
+	document.getElementById('Table').style.filter = 'blur(0px)';
+	document.getElementById('Overlay').style.display = 'none';
 	document.querySelector('.endgame').style.display = 'none';
 
 	for (var i = 0; i < cells.length; i++){
@@ -102,115 +102,115 @@ function PrepararTablero(){
 	}
 };
 
-function Ganador(){
-	if (GanadorT === 'X'){
-		VictoriasX++;
-		document.getElementById('scoreX').innerText = VictoriasX;
+function SomebodyWon(){
+	if (Winner === 'X'){
+		XVictories++;
+		document.getElementById('scoreX').innerText = XVictories;
 	} else {
-		VictoriasO++;
-		document.getElementById('scoreO').innerText = VictoriasO;
+		OVictories++;
+		document.getElementById('scoreO').innerText = OVictories;
 	}
-	document.getElementById('overlay').style.display = 'block';
-	document.getElementById('text').innerText = 'El ganador es: ' + GanadorT + '!!';
-	document.getElementById('La_Tabla').style.filter = 'blur(5px)';
+	document.getElementById('Overlay').style.display = 'block';
+	document.getElementById('text').innerText = 'The winner is: ' + Winner + '!!';
+	document.getElementById('Table').style.filter = 'blur(5px)';
 };
 
-function Empate(){
-	Empates++;
-	document.getElementById('empates').innerText = Empates;
-	document.getElementById('overlay').style.display = 'block';
+function ItsATie(){
+	TiesCounter++;
+	document.getElementById('TiesID').innerText = TiesCounter;
+	document.getElementById('Overlay').style.display = 'block';
 	document.getElementById('text').innerText = 'Empate...';
-	document.getElementById('La_Tabla').style.filter = 'blur(5px)';
+	document.getElementById('Table').style.filter = 'blur(5px)';
 };
 
-function LogicaCPU(){
-	var CasillaSeleccionada = 9;
+function CPUsLogic(){
+	var ChoosenCell = 9;
 
-	if (GanadorT === 0){
-		if (ContadorDeTurnos <= 1){
-	 		while (CasillaSeleccionada === 9 || cells[CasillaSeleccionada].innerText === 'X'){
-				CasillaSeleccionada = cells[Math.floor(Math.random() * cells.length)].id;
+	if (Winner === "Still no one"){
+		if (TurnsCounter <= 1){
+	 		while (ChoosenCell === 9 || cells[ChoosenCell].innerText === 'X'){
+				ChoosenCell = cells[Math.floor(Math.random() * cells.length)].id;
 			}
 
-			SelecciondeJugadaLista = true;
+			PlayReady = true;
 		} else {
-			CasillaSeleccionada=RevisarTablero();
+			ChoosenCell=CheckBoard();
 		}
 	
-		cells[CasillaSeleccionada].innerText = 'O';
-		TurnoActual = 'X';
-		SiguienteTurno = 'O';
-		VerSiHayGanador(CasillaSeleccionada);
+		cells[ChoosenCell].innerText = 'O';
+		CurrentTurn = 'X';
+		NextTurn = 'O';
+		CheckForWinner(ChoosenCell);
 	}
 };
 
-function SwitchPlayers(){
+function GameMode(){
 	if (VsCOM){
-		document.getElementById('VS').innerText = 'Player vs player';
-		document.getElementById('El_Switch').innerText = 'Player vs CPU';
+		document.getElementById('VS').innerText = 'Player vs Player';
+		document.getElementById('Switch').innerText = 'Player vs CPU';
 		VsCOM = false;
 	} else if (!(VsCOM)){
 		document.getElementById('VS').innerText = 'Player vs CPU';
-		document.getElementById('El_Switch').innerText = 'Player vs Player';
+		document.getElementById('Switch').innerText = 'Player vs Player';
 		VsCOM = true;
 	}
-	VictoriasX = 0;
-	VictoriasO = 0;
-	Empates = 0;
-	document.getElementById('scoreX').innerText = VictoriasX;
-	document.getElementById('scoreO').innerText = VictoriasO;
-	document.getElementById('empates').innerText = Empates;
+	XVictories = 0;
+	OVictories = 0;
+	TiesCounter = 0;
+	document.getElementById('scoreX').innerText = XVictories;
+	document.getElementById('scoreO').innerText = OVictories;
+	document.getElementById('TiesID').innerText = TiesCounter;
 	startGame();
 };
 
-function RevisarTablero(){
-	var XEnMismaLinea = 0;
-	var OEnMismaLinea = 0;
-	var SelecciondeJugadaLista = false;
-	var	CasillaParaEntregar = 9;
-	var NivelPrioridad = 4;
-	var PosibleCasilla = 9;
-	var NuevoNivel = 0;
+function CheckBoard(){
+	var XAtSameLine = 0;
+	var OAtSameLine = 0;
+	var PlayReady = false;
+	var	CelltoReturn = 9;
+	var PriorityLevel = 4;
+	var PossibleCell = 9;
+	var NewLevel = 0;
 
 	for (var i = 0; i < winCombos.length; i++){
-		if (SelecciondeJugadaLista){
+		if (PlayReady){
 			break;
 		} else {
-			XEnMismaLinea = 0;
-			OEnMismaLinea = 0;
+			XAtSameLine = 0;
+			OAtSameLine = 0;
 
 		for (var j = 0; j < winCombos[i].length; j++ ){
 			if (winCombos[i][j] === 'X'){
-				XEnMismaLinea++;
+				XAtSameLine++;
 			} else if (winCombos[i][j] === 'O'){
-				OEnMismaLinea++;
+				OAtSameLine++;
 			} else {
-				PosibleCasilla = winCombos[i][j];
+				PossibleCell = winCombos[i][j];
 			}
 	}
-		   NuevoNivel = ResolucionDeCombinaciones (XEnMismaLinea, OEnMismaLinea);
-	       if (NivelPrioridad >= NuevoNivel){
-	        	 NivelPrioridad = NuevoNivel
-	        	 CasillaParaEntregar = PosibleCasilla;
+		   NewLevel = CombosResolution (XAtSameLine, OAtSameLine);
+	       if (PriorityLevel >= NewLevel){
+	        	 PriorityLevel = NewLevel
+	        	 CelltoReturn = PossibleCell;
 	       }
 	   }
 	}
-	return CasillaParaEntregar;
+	return CelltoReturn;
 };
 
-function ResolucionDeCombinaciones (XInterna, OInterna){
-	var PrioridadInterna = 0;
+function CombosResolution (InternX, InternO){
+	var InternPriority = 0;
 
-	if (XInterna === 0 && OInterna === 2){
-	    PrioridadInterna = 1;
-	} else if (XInterna === 2 && OInterna === 0){
-		PrioridadInterna = 2;
-	} else if (XInterna === 0 && OInterna === 1){
-		PrioridadInterna = 3;
+	if (InternX === 0 && InternO === 2){
+	    InternPriority = 1;
+	} else if (InternX === 2 && InternO === 0){
+		InternPriority = 2;
+	} else if (InternX === 0 && InternO === 1){
+		InternPriority = 3;
 	} else {  
-		PrioridadInterna = 4;
+		InternPriority = 4;
 	}
 
-	return PrioridadInterna;
+	return InternPriority;
 
 };
