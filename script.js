@@ -27,7 +27,7 @@ function turnClick(square) {
 		if (CurrentTurn === 'X'){
 			SetX(SelectedCell);
 			CheckForWinner(SelectedCell);
-			if (VsCOM === true && TurnsCounter<9){
+			if (VsCOM === true && TurnsCounter<9 && Winner == "Still no one"){
 				CPUsLogic();
 			}
 		} else if (CurrentTurn === 'O'){
@@ -41,17 +41,81 @@ function SetX(xCell){
   cells[xCell].innerText = 'X';
 	var targete = cells[xCell.innerText];
 
-	CurrentTurn = 'O';
-	NextTurn = 'X';
+	SwapTurns();
 };
 
 function SetO(oCell){
 	cells[oCell].innerText = 'O';
 	var targete = cells[oCell].id;
 
-	CurrentTurn = 'X';
-	NextTurn = 'O';
+	SwapTurns();
 };
+
+function PrepareBoard(){
+	document.getElementById('Table').style.filter = 'blur(0px)';
+	document.getElementById('Overlay').style.display = 'none';
+	document.querySelector('.endgame').style.display = 'none';
+
+	for (var i = 0; i < cells.length; i++){
+		cells [i].innerText = '';
+		cells [i].style.removeProperty('background-color');
+		cells [i].addEventListener('click', turnClick, false);
+	}
+};
+
+function SomebodyWon(){
+	if (Winner === 'X'){
+		XVictories++;
+		document.getElementById('scoreX').innerText = XVictories;
+	} else {
+		OVictories++;
+		document.getElementById('scoreO').innerText = OVictories;
+	}
+	document.getElementById('Overlay').style.display = 'block';
+	document.getElementById('text').innerText = 'The winner is: ' + Winner + '!!';
+	document.getElementById('Table').style.filter = 'blur(5px)';
+};
+
+function ItsATie(){
+	TiesCounter++;
+	document.getElementById('TiesID').innerText = TiesCounter;
+	document.getElementById('Overlay').style.display = 'block';
+	document.getElementById('text').innerText = 'Empate...';
+	document.getElementById('Table').style.filter = 'blur(5px)';
+};
+
+function SwapTurns(){
+	if(CurrentTurn == 'X'){
+		CurrentTurn = 'O';
+		NextTurn = 'X';
+	} else {
+		CurrentTurn = 'X';
+		NextTurn = 'O';
+	}
+}
+
+function GameMode(){
+	if (VsCOM){
+		document.getElementById('VS').innerText = 'Player vs Player';
+		document.getElementById('Switch').innerText = 'Player vs CPU';
+		VsCOM = false;
+	} else if (!(VsCOM)){
+		document.getElementById('VS').innerText = 'Player vs CPU';
+		document.getElementById('Switch').innerText = 'Player vs Player';
+		VsCOM = true;
+	}
+	ResetScore();
+	startGame();
+};
+
+function ResetScore(){
+	XVictories = 0;
+	OVictories = 0;
+	TiesCounter = 0;
+	document.getElementById('scoreX').innerText = XVictories;
+	document.getElementById('scoreO').innerText = OVictories;
+	document.getElementById('TiesID').innerText = TiesCounter;
+}
 
 function CheckForWinner(SelectedCell){
 	TurnsCounter++;
@@ -90,78 +154,29 @@ function VariableInitiator(){
 ]
 };
 
-function PrepareBoard(){
-	document.getElementById('Table').style.filter = 'blur(0px)';
-	document.getElementById('Overlay').style.display = 'none';
-	document.querySelector('.endgame').style.display = 'none';
-
-	for (var i = 0; i < cells.length; i++){
-		cells [i].innerText = '';
-		cells [i].style.removeProperty('background-color');
-		cells [i].addEventListener('click', turnClick, false);
-	}
-};
-
-function SomebodyWon(){
-	if (Winner === 'X'){
-		XVictories++;
-		document.getElementById('scoreX').innerText = XVictories;
-	} else {
-		OVictories++;
-		document.getElementById('scoreO').innerText = OVictories;
-	}
-	document.getElementById('Overlay').style.display = 'block';
-	document.getElementById('text').innerText = 'The winner is: ' + Winner + '!!';
-	document.getElementById('Table').style.filter = 'blur(5px)';
-};
-
-function ItsATie(){
-	TiesCounter++;
-	document.getElementById('TiesID').innerText = TiesCounter;
-	document.getElementById('Overlay').style.display = 'block';
-	document.getElementById('text').innerText = 'Empate...';
-	document.getElementById('Table').style.filter = 'blur(5px)';
-};
-
 function CPUsLogic(){
 	var ChoosenCell = 9;
 
-	if (Winner === "Still no one"){
-		if (TurnsCounter <= 1){
-	 		while (ChoosenCell === 9 || cells[ChoosenCell].innerText === 'X'){
-				ChoosenCell = cells[Math.floor(Math.random() * cells.length)].id;
+	ChoosenCell = DecidePlay(ChoosenCell);
+	SwapTurns();
+	CheckForWinner(ChoosenCell);
+
+};
+
+function DecidePlay(CelltoReturn){
+
+	if (TurnsCounter <= 1){
+	 		while (CelltoReturn === 9 || cells[CelltoReturn].innerText === 'X'){
+				CelltoReturn = cells[Math.floor(Math.random() * cells.length)].id;
 			}
-
 			PlayReady = true;
-		} else {
-			ChoosenCell=CheckBoard();
+		} else if(TurnsCounter >= 2){
+			CelltoReturn=CheckBoard();
 		}
-	
-		cells[ChoosenCell].innerText = 'O';
-		CurrentTurn = 'X';
-		NextTurn = 'O';
-		CheckForWinner(ChoosenCell);
-	}
-};
 
-function GameMode(){
-	if (VsCOM){
-		document.getElementById('VS').innerText = 'Player vs Player';
-		document.getElementById('Switch').innerText = 'Player vs CPU';
-		VsCOM = false;
-	} else if (!(VsCOM)){
-		document.getElementById('VS').innerText = 'Player vs CPU';
-		document.getElementById('Switch').innerText = 'Player vs Player';
-		VsCOM = true;
-	}
-	XVictories = 0;
-	OVictories = 0;
-	TiesCounter = 0;
-	document.getElementById('scoreX').innerText = XVictories;
-	document.getElementById('scoreO').innerText = OVictories;
-	document.getElementById('TiesID').innerText = TiesCounter;
-	startGame();
-};
+		cells[CelltoReturn].innerText = 'O';
+		return CelltoReturn;
+}
 
 function CheckBoard(){
 	var XAtSameLine = 0;
